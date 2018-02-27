@@ -14,7 +14,6 @@ ctx.fillStyle = "rgba(0,0,0,1)";
 
 var squares = [];
 
-
 function map(n, a, b, _a, _b) {
   var d = b - a;
   var _d = _b - _a;
@@ -24,7 +23,7 @@ function map(n, a, b, _a, _b) {
 
 
 function setup() {
-    for (var s = 0; s < cw; s += 16) {
+    for (var s = 0; s < cw; s += 10) {
         var square = new SquigglySquare(s);
         squares.push(square);
     }
@@ -32,6 +31,8 @@ function setup() {
 
 
 function draw() {
+    requestId = window.requestAnimationFrame(draw);
+
     ctx.fillRect(0, 0, cw, ch);
     noiseDetail(2, .5);
 
@@ -48,33 +49,66 @@ function SquigglySquare(len) {
 
     this.x = (cw - len)/2;
     this.y = (ch - len)/2;
+
     this.xoff = Math.random() * 10000;
     this.Xoff = this.xoff;
-
     this.phi = Math.random() * 10000;
 
-    this.draw = function() {
+    function squigglyHorizontal(height, xstart, xend) {
         ctx.beginPath();
+        this.xoff = this.Xoff;
 
-        this.xoff = this.Xoff; // reset xoff;
+        ctx.moveTo(xstart, height);
 
-        var x = this.x;
-        var y = -Math.abs(Math.sin((x + noise(this.xoff) * 100) * frequency + this.phi) * amplitude) + this.y;
+        for (var x = xstart; x < xend; x++) {
+            if (x > cw / 3 && x < 2 * cw / 3) {
+                var k = map(x, cw / 3, 2 * cw / 3, 0, 180);
+            } else {
+                k = 0;
+            }
 
-        ctx.moveTo(x, y);
-        ctx.lineTo(x, y+len);
-        ctx.stroke();
+            var y = -Math.abs(Math.sin((x + noise(this.xoff) * 100) * frequency + this.phi) * (amplitude + Math.sin(k * rad) * 50)) + this.y;
 
-        ctx.moveTo(x, y);
-        ctx.lineTo(x+len, y);
-        ctx.stroke();
+            ctx.lineTo(x, y);
 
-        ctx.moveTo(x+len, y);
-        ctx.lineTo(x+len, y+len);
-        ctx.stroke();
-        
-        ctx.moveTo(x, y+len);
-        ctx.lineTo(x+len, y+len);
+            this.xoff += 0.05;
+        }
+
+        ctx.lineTo(xend, height);
+
+        ctx.closePath();
+        ctx.fill();
         ctx.stroke();
     }
+
+    this.draw = function() {
+        var x = this.x;
+        var y = this.y;
+        squigglyHorizontal(y, x - len, x + len);
+        // squigglyHorizontal(y + len, x - len, x + len);
+        // ctx.beginPath();
+
+        // this.xoff = this.Xoff; // reset xoff;
+
+        // var x = this.x;
+        // var y = -Math.abs(Math.sin((x + noise(this.xoff) * 100) * frequency + this.phi) * amplitude) + this.y;
+
+        // ctx.moveTo(x, y);
+        // ctx.lineTo(x, y+len);
+        // ctx.stroke();
+
+        // ctx.moveTo(x, y);
+        // ctx.lineTo(x+len, y);
+        // ctx.stroke();
+
+        // ctx.moveTo(x+len, y);
+        // ctx.lineTo(x+len, y+len);
+        // ctx.stroke();
+        
+        // ctx.moveTo(x, y+len);
+        // ctx.lineTo(x+len, y+len);
+        // ctx.stroke();
+    }
 }
+
+requestId = window.requestAnimationFrame(draw);
