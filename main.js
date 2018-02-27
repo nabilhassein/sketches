@@ -13,7 +13,9 @@ ctx.strokeStyle = "#fff";
 ctx.fillStyle = "rgba(0,0,0,1)";
 
 var increment = 0.05;
-var lines = [];
+var squares = [];
+
+var len = 10;
 
 
 function map(n, a, b, _a, _b) {
@@ -25,42 +27,29 @@ function map(n, a, b, _a, _b) {
 
 
 function setup() {
-    for (var x = 60; x < cw; x += 16) {
-        for (var y = 60; y < ch; y += 16) {
-            var line = new SquigglyLine(x, y);
-            lines.push(line);
+
+    for (var x = 64; x < cw; x += 16) {
+        for (var y = 64; y < ch; y += 16) {
+            var square = new SquigglySquare(x, y, len);
+            squares.push(square);
+            len += 10;
         }
     }
 }
 
 
 function draw() {
-    var size = 800;
-    var numSquares = 30;
-    var center = size/2;
-    var step = size / (numSquares*4);
-
-    for (var i = 1; i <= numSquares; i++) {
-        var p1 = center + i*step;
-        var p2 = center - i*step;
-
-        line(p2, p2, p1, p2);
-        line(p1, p2, p1, p1);
-        line(p1, p1, p2, p1);
-        line(p2, p1, p2, p2);
-    }
-    
     ctx.fillRect(0, 0, cw, ch);
 
     noiseDetail(2, .5);
 
-    for (var i = 0; i < lines.length; i++) {
-        lines[i].phi += 1 / 30;
-        lines[i].draw(i);
+    for (var i = 0; i < squares.length; i++) {
+        squares[i].phi += 1 / 30;
+        squares[i].draw(i);
     }
 }
 
-function SquigglyLine(x, y) {
+function SquigglySquare(x, y, len) {
     var amplitude = 5;
     var frequency = .02;
     var rad = Math.PI / 180;
@@ -75,22 +64,21 @@ function SquigglyLine(x, y) {
 
         this.xoff = this.Xoff; // reset xoff;
 
-//        for (var x = -2; x < cw + 2; x++) {
-            if (x > cw / 3 && x < 2 * cw / 3) {
-                var k = map(x, cw / 3, 2 * cw / 3, 0, 180);
-            } else {
-                k = 0;
-            }
+        if (x > cw / 3 && x < 2 * cw / 3) {
+            var k = map(x, cw / 3, 2 * cw / 3, 0, 180);
+        } else {
+            k = 0;
+        }
 
-            var y = -Math.abs(Math.sin((x + noise(this.xoff) * 100) * frequency + this.phi) * (amplitude + Math.sin(k * rad) * 50)) + this.y;
+        var y = -Math.abs(Math.sin((x + noise(this.xoff) * 100) * frequency + this.phi) * (amplitude + Math.sin(k * rad) * 50)) + this.y;
 
-            ctx.lineTo(x, y);
+        ctx.lineTo(x, y);
 
-            this.xoff += increment;
+        this.xoff += increment;
 
-//        }
+        ctx.lineTo(x + len, y + len);
         ctx.lineTo(cw + 2, ch + 2);
-        ctx.lineTo(-2, ch + 2);
+        // ctx.lineTo(-2, ch + 2);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
