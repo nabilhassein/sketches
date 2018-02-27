@@ -6,10 +6,12 @@ https://codepen.io/enxaneta/pen/7e315d161a8ee073ded48ab5d1669290
 */
 
 var squares = [];
+var noisiness = 5;
+var step = 10;
 
 function setup() {
     createCanvas(800, 800);
-    for (var s = 0; s < width; s += 10) {
+    for (var s = 0; s < width; s += step) {
         var square = new SquigglySquare(s);
         squares.push(square);
     }
@@ -32,7 +34,7 @@ function SquigglySquare(len) {
         beginShape();
 
         for (var x = xstart; x < xend; x++) {
-            var y = noise(x + Math.random(), frameCount) + column;
+            var y = column + noisiness*noise(x + Math.random(), frameCount);
             curveVertex(x, y);
         }
 
@@ -45,7 +47,7 @@ function SquigglySquare(len) {
         beginShape();
 
         for (var y = ystart; y < yend; y++) {
-            var x = noise(y + Math.random(), frameCount) + row;
+            var x = row + noisiness*noise(y + Math.random(), frameCount);
             curveVertex(x, y);
         }
 
@@ -53,11 +55,12 @@ function SquigglySquare(len) {
     }
 
     this.draw = function() {
-        var x = (width - len)/2;
-        var y = (height - len)/2;
-        squigglyHorizontal(y, x - len, x + len);
-        squigglyHorizontal(y + len, x - len, x + len);
-        squigglyVertical(x, y - len, y + len);
-        squigglyVertical(x + len, y - len, y + len);
+        var x = width/2;
+        var y = height/2;
+
+        squigglyHorizontal(y - len, x - len, x + len + step/2);
+        squigglyHorizontal(y + len, x - len, x + len + step/2);
+        squigglyVertical(x - len, y - len, y + len + step/2);
+        squigglyVertical(x + len, y - len, y + len + step/2);
     }
 }
