@@ -12,10 +12,7 @@ ctx.lineJoin = "round";
 ctx.strokeStyle = "#fff";
 ctx.fillStyle = "rgba(0,0,0,1)";
 
-var increment = 0.05;
 var squares = [];
-
-var len = 10;
 
 
 function map(n, a, b, _a, _b) {
@@ -27,61 +24,57 @@ function map(n, a, b, _a, _b) {
 
 
 function setup() {
-
-    for (var x = 64; x < cw; x += 16) {
-        for (var y = 64; y < ch; y += 16) {
-            var square = new SquigglySquare(x, y, len);
-            squares.push(square);
-            len += 10;
-        }
+    for (var s = 0; s < cw; s += 16) {
+        var square = new SquigglySquare(s);
+        squares.push(square);
     }
 }
 
 
 function draw() {
     ctx.fillRect(0, 0, cw, ch);
-
     noiseDetail(2, .5);
 
     for (var i = 0; i < squares.length; i++) {
         squares[i].phi += 1 / 30;
-        squares[i].draw(i);
+        squares[i].draw();
     }
 }
 
-function SquigglySquare(x, y, len) {
+function SquigglySquare(len) {
     var amplitude = 5;
     var frequency = .02;
     var rad = Math.PI / 180;
 
-    this.x = x;
-    this.y = y;
+    this.x = (cw - len)/2;
+    this.y = (ch - len)/2;
     this.xoff = Math.random() * 10000;
     this.Xoff = this.xoff;
+
     this.phi = Math.random() * 10000;
-    this.draw = function(i) {
+
+    this.draw = function() {
         ctx.beginPath();
 
         this.xoff = this.Xoff; // reset xoff;
 
-        if (x > cw / 3 && x < 2 * cw / 3) {
-            var k = map(x, cw / 3, 2 * cw / 3, 0, 180);
-        } else {
-            k = 0;
-        }
+        var x = this.x;
+        var y = -Math.abs(Math.sin((x + noise(this.xoff) * 100) * frequency + this.phi) * amplitude) + this.y;
 
-        var y = -Math.abs(Math.sin((x + noise(this.xoff) * 100) * frequency + this.phi) * (amplitude + Math.sin(k * rad) * 50)) + this.y;
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y+len);
+        ctx.stroke();
 
-        ctx.lineTo(x, y);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x+len, y);
+        ctx.stroke();
 
-        this.xoff += increment;
-
-        ctx.lineTo(x + len, y + len);
-        ctx.lineTo(cw + 2, ch + 2);
-        // ctx.lineTo(-2, ch + 2);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(x+len, y);
+        ctx.lineTo(x+len, y+len);
+        ctx.stroke();
+        
+        ctx.moveTo(x, y+len);
+        ctx.lineTo(x+len, y+len);
         ctx.stroke();
     }
 }
-
