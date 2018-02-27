@@ -6,8 +6,7 @@ https://codepen.io/enxaneta/pen/7e315d161a8ee073ded48ab5d1669290
 */
 
 var squares = [];
-var noisiness = 5;
-var step = 10;
+var step = 20;
 
 function setup() {
     createCanvas(800, 800);
@@ -22,18 +21,20 @@ function draw() {
     background(0);
     noiseDetail(2, .5);
 
+    var noisiness = mouseX / 10;
+
     for (var i = 0; i < squares.length; i++) {
-        squares[i].draw();
+        squares[i].draw(noisiness);
     }
 }
 
 function SquigglySquare(len) {
-    function squigglyHorizontal(column, xstart, xend) {
+    function squigglyHorizontal(column, xstart, xend, noisiness) {
         noFill();
         stroke(255);
         beginShape();
 
-        for (var x = xstart; x < xend; x++) {
+        for (var x = xstart; x <= xend; x++) {
             var y = column + noisiness*noise(x + Math.random(), frameCount);
             curveVertex(x, y);
         }
@@ -41,12 +42,12 @@ function SquigglySquare(len) {
         endShape();
     }
 
-    function squigglyVertical(row, ystart, yend) {
+    function squigglyVertical(row, ystart, yend, noisiness) {
         noFill();
         stroke(255);
         beginShape();
 
-        for (var y = ystart; y < yend; y++) {
+        for (var y = ystart; y <= yend; y++) {
             var x = row + noisiness*noise(y + Math.random(), frameCount);
             curveVertex(x, y);
         }
@@ -54,13 +55,13 @@ function SquigglySquare(len) {
         endShape();
     }
 
-    this.draw = function() {
+    this.draw = function(noisiness) {
         var x = width/2;
         var y = height/2;
 
-        squigglyHorizontal(y - len, x - len, x + len + step/2);
-        squigglyHorizontal(y + len, x - len, x + len + step/2);
-        squigglyVertical(x - len, y - len, y + len + step/2);
-        squigglyVertical(x + len, y - len, y + len + step/2);
+        squigglyHorizontal(y - len, x - len, x + len, noisiness);
+        squigglyHorizontal(y + len, x - len, x + len, noisiness);
+        squigglyVertical(x - len, y - len, y + len, noisiness);
+        squigglyVertical(x + len, y - len, y + len, noisiness);
     }
 }
