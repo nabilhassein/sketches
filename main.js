@@ -21,7 +21,7 @@ function draw() {
     background(0);
     noiseDetail(2, .5);
 
-    var noisiness = mouseX / 10;
+    var noisiness = mouseX / 50;
 
     for (var i = 0; i < squares.length; i++) {
         squares[i].draw(noisiness);
